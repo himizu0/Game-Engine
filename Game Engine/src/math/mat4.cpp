@@ -47,9 +47,10 @@ namespace engine { namespace math {
 		const float s = sin(r);
 		const float omc = 1.0f - c;
 
-		const float x = axis.x;
-		const float y = axis.y;
-		const float z = axis.z;
+		const vec3 a = normalize(axis);
+		const float& x = a.x;
+		const float& y = a.y;
+		const float& z = a.z;
 
 		result(0, 0) = c + x * x * omc;
 		result(1, 0) = y * x * omc + z * s;
@@ -72,6 +73,16 @@ namespace engine { namespace math {
 		result(0, 0) = scale.x;
 		result(1, 1) = scale.y;
 		result(2, 2) = scale.z;
+
+		return result;
+	}
+
+	mat4 mat4::scale(float scale) {
+		mat4 result(1);
+
+		result(0, 0) = scale;
+		result(1, 1) = scale;
+		result(2, 2) = scale;
 
 		return result;
 	}
@@ -215,16 +226,16 @@ namespace engine { namespace math {
 		return result;
 #else
 		__m128 leftColumns[4];
-		leftColumns[0] = _mm_load_ps(&left(0, 0));
-		leftColumns[1] = _mm_load_ps(&left(0, 1));
-		leftColumns[2] = _mm_load_ps(&left(0, 2));
-		leftColumns[3] = _mm_load_ps(&left(0, 3));
+		leftColumns[0] = _mm_load_ps(left.elements[0]);
+		leftColumns[1] = _mm_load_ps(left.elements[1]);
+		leftColumns[2] = _mm_load_ps(left.elements[2]);
+		leftColumns[3] = _mm_load_ps(left.elements[3]);
 
 		__m128 rightColumns[4];
-		rightColumns[0] = _mm_load_ps(&right(0, 0));
-		rightColumns[1] = _mm_load_ps(&right(0, 1));
-		rightColumns[2] = _mm_load_ps(&right(0, 2));
-		rightColumns[3] = _mm_load_ps(&right(0, 3));
+		rightColumns[0] = _mm_load_ps(right.elements[0]);
+		rightColumns[1] = _mm_load_ps(right.elements[1]);
+		rightColumns[2] = _mm_load_ps(right.elements[2]);
+		rightColumns[3] = _mm_load_ps(right.elements[3]);
 
 		__m128 resultColumns[4];
 
@@ -236,10 +247,10 @@ namespace engine { namespace math {
 		}
 
 		mat4 result;
-		_mm_store_ps(&result(0, 0), resultColumns[0]);
-		_mm_store_ps(&result(0, 1), resultColumns[1]);
-		_mm_store_ps(&result(0, 2), resultColumns[2]);
-		_mm_store_ps(&result(0, 3), resultColumns[3]);
+		_mm_store_ps(result.elements[0], resultColumns[0]);
+		_mm_store_ps(result.elements[1], resultColumns[1]);
+		_mm_store_ps(result.elements[2], resultColumns[2]);
+		_mm_store_ps(result.elements[3], resultColumns[3]);
 		return result;
 #endif
 	}
@@ -285,6 +296,14 @@ namespace engine { namespace math {
 			matrix(1, 0) * vector.x + matrix(1, 1) * vector.y + matrix(1, 2) * vector.z + matrix(1, 3),
 			matrix(2, 0) * vector.x + matrix(2, 1) * vector.y + matrix(2, 2) * vector.z + matrix(2, 3)
 		);
+	}
+
+	mat4& mat4::wipeTranslation() {
+		(*this)(0, 3) = 0;
+		(*this)(1, 3) = 0;
+		(*this)(2, 3) = 0;
+
+		return *this;
 	}
 	
 	float& mat4::operator()(unsigned int row, unsigned int column) {

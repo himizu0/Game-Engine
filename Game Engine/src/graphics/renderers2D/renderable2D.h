@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/texture.h"
+#include "graphics/textures/texture.h"
 #include "math/math.h"
 
 namespace engine { namespace graphics {

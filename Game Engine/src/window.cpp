@@ -31,6 +31,8 @@ namespace engine {
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		glfwSwapInterval(0);
+
+		glfwWindowHint(GLFW_SAMPLES, 4);
 	}
 
 	Window::~Window() {

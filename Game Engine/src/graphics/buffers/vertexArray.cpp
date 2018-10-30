@@ -1,20 +1,21 @@
 #include <GL/glew.h>
 #include "vertexArray.h"
+#include "utils.h"
 
 namespace engine { namespace graphics {
 	VertexArray::VertexArray() {
-		glGenVertexArrays(1, &m_rendererID);
+		GLCall(glGenVertexArrays(1, &m_vertexArrayID));
 	}
 	
 	VertexArray::~VertexArray() {
-		glDeleteVertexArrays(1, &m_rendererID);
+		GLCall(glDeleteVertexArrays(1, &m_vertexArrayID));
 	}
 
 	void VertexArray::bind() const {
-		glBindVertexArray(m_rendererID);
+		GLCall(glBindVertexArray(m_vertexArrayID));
 	}
 
 	void VertexArray::unbind() const {
-		glBindVertexArray(0);
+		GLCall(glBindVertexArray(0));
 	}
 } }

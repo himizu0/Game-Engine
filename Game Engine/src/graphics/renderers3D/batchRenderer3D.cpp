@@ -1,10 +1,16 @@
 #include "batchRenderer3D.h"
 
 #include <algorithm>
+#include "utils.h"
 
 namespace engine { namespace graphics {
-	BatchRenderer3D::BatchRenderer3D(Shader* shader)
-		: m_vertexCount(0), m_shader(shader) {
+	BatchRenderer3D::BatchRenderer3D()
+		: m_vertexCount(0) {
+		
+		m_ubo = new UniformBuffer(1024 * sizeof(math::mat4), 1, nullptr, true);
+
+		m_vao = new VertexArray();
+		m_vao->bind();
 
 		m_vbo = new VertexBuffer(nullptr, RENDERER3D_BUFFER_SIZE, true);
 		m_vbo->pushLayout<float>(3);	//position
@@ -14,9 +20,13 @@ namespace engine { namespace graphics {
 		m_vbo->pushLayout<float>(1);	//specularSlot
 		m_vbo->pushLayout<float>(1);	//modelSlot
 		m_vbo->enableLayouts();
+
+		m_vao->unbind();
 	}
 
 	BatchRenderer3D::~BatchRenderer3D() {
+		delete m_ubo;
+		delete m_vao;
 		delete m_vbo;
 	}
 
@@ -34,7 +44,8 @@ namespace engine { namespace graphics {
 		unsigned int specularSlot = 0;
 		unsigned int modelSlot = 0;
 
-		if (m_textureSlotCache.find(diffuseID) != m_textureSlotCache.end() && m_textureSlotCache.find(specularID) != m_textureSlotCache.end()) {
+		if (m_textureSlotCache.find(diffuseID) != m_textureSlotCache.end() 
+			&& m_textureSlotCache.find(specularID) != m_textureSlotCache.end()) {
 
 			diffuseSlot = m_textureSlotCache[diffuseID];
 			specularSlot = m_textureSlotCache[specularID];
@@ -42,11 +53,11 @@ namespace engine { namespace graphics {
 		else {
 			if (m_textureSlotCache.size() >= 31) {
 				end();
-				flush();
+				//flush();
 				begin();
 			}
-			m_textureSlotCache[diffuseID] = m_textureSlotCache.size();
-			m_textureSlotCache[specularID] = m_textureSlotCache.size();
+			m_textureSlotCache[diffuseID] = m_textureSlotCache.size() + 1;
+			m_textureSlotCache[specularID] = m_textureSlotCache.size() + 1;
 			diffuseSlot = m_textureSlotCache[diffuseID];
 			specularSlot = m_textureSlotCache[specularID];
 		}
@@ -84,26 +95,24 @@ namespace engine { namespace graphics {
 		}
 	}
 
-	void BatchRenderer3D::flush() {
-		m_shader->use();
+	void BatchRenderer3D::flush(Shader* shader) {
+		shader->use();
 
 		for (auto i = m_textureSlotCache.begin(); i != m_textureSlotCache.end(); i++) {
-			glActiveTexture(GL_TEXTURE0 + i->second);
-			glBindTexture(GL_TEXTURE_2D, i->first);
+			GLCall(glActiveTexture(GL_TEXTURE0 + i->second));
+			GLCall(glBindTexture(GL_TEXTURE_2D, i->first));
 		}
 
 		int textures[32];
 		for (unsigned int i = 0; i < 32; i++) textures[i] = i;
 
-		m_shader->use();
-		m_shader->setUniform1iv("u_textures", textures, 32);
-		m_shader->setUniformMat4fv("u_models", &m_models[0], 64);
-		m_shader->setUniformMat4fv("u_normals", &m_normals[0], 64);
-\
+		shader->use();
+		shader->setUniform1iv("u_textures", textures, 31);
 
-		m_vbo->bind();
-		glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
-		printf("Draw");
+		setupUBO();
+
+		m_vao->bind();
+		GLCall(glDrawArrays(GL_TRIANGLES, 0, m_vertexCount));
 
 		m_vertexCount = 0;
 		m_textureSlotCache.clear();
@@ -112,10 +121,18 @@ namespace engine { namespace graphics {
 	}
 
 	void BatchRenderer3D::begin() {
-		m_buffer = (Vertex*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		m_vao->bind();
+		GLCall(m_buffer = (Vertex*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+		m_vao->unbind();
 	}
 
 	void BatchRenderer3D::end() {
-		glUnmapBuffer(GL_ARRAY_BUFFER);
+		GLCall(glUnmapBuffer(GL_ARRAY_BUFFER));
+	}
+
+	void BatchRenderer3D::setupUBO() const{
+		m_ubo->bind();
+		m_ubo->subData(64 * sizeof(math::mat4), &m_models[0], 0);
+		m_ubo->subData(64 * sizeof(math::mat4), &m_normals[0], 64 * sizeof(math::mat4));
 	}
 } }

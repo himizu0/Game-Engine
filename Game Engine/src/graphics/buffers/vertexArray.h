@@ -3,7 +3,7 @@
 namespace engine { namespace graphics {
 	class VertexArray {
 		private:
-		unsigned int m_rendererID;
+		unsigned int m_vertexArrayID;
 
 		public:
 		VertexArray();

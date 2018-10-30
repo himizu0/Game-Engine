@@ -29,6 +29,16 @@ namespace engine { namespace math {
 		);
 	}
 
+	vec3& vec3::normalize() {
+		const float oom = 1.0f / magnitude(*this);
+
+		x /= oom;
+		y /= oom;
+		z / oom;
+
+		return *this;
+	}
+
 	std::ostream& operator<<(std::ostream& stream, const vec3& vector) {
 		return stream << "(" << vector.x << "," << vector.y << ", " << vector.z << ")";
 	}

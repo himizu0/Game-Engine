@@ -12,6 +12,8 @@ namespace engine { namespace math {
 		friend float dot(const vec3& lett, const vec3& right);
 		friend vec3 cross(const vec3& left, const vec3& right);
 
+		vec3& normalize();
+
 		friend std::ostream& operator<<(std::ostream& stream, const vec3& vector);
 		friend vec3 operator+(const vec3& left, const vec3& right);
 		friend vec3 operator-(const vec3& left, const vec3& right);

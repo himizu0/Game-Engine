@@ -12,6 +12,7 @@ namespace engine { namespace graphics {
 		unsigned int m_rendererID;
 		const char* m_filepath;
 		std::string m_vertexSource;
+		std::string m_geometrySource;
 		std::string m_fragmentSource;
 		std::unordered_map<const char*, int> m_uniformLocationCache;
 		
@@ -30,7 +31,8 @@ namespace engine { namespace graphics {
 		void setUniform1iv(const char* name, int* values, unsigned int count);
 		void setUniform1f(const char* name, float value);
 		void setUniform3f(const char* name, float v0, float v1, float v2);
+		void setUniform4f(const char* name, float v0, float v1, float v2, float v3);
 		void setUniformMat4f(const char* name, const math::mat4& matrix);
-		void setUniformMat4fv(const char* name, math::mat4* values, unsigned int count);
+		void setUniformMat4fv(const char* name, const math::mat4* values, unsigned int count);
 	};
 } }

@@ -136,16 +136,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\graphics\buffers\frameBuffer.cpp" />
+    <ClCompile Include="src\graphics\buffers\uniformBuffer.cpp" />
+    <ClCompile Include="src\graphics\textures\cubemap.cpp" />
     <ClCompile Include="src\graphics\model.cpp" />
     <ClCompile Include="src\graphics\Renderers2D\batchRenderer2D.cpp" />
     <ClCompile Include="src\graphics\buffers\indexBuffer.cpp" />
     <ClCompile Include="src\graphics\renderers3D\batchRenderer3D.cpp" />
+    <ClCompile Include="src\graphics\skybox.cpp" />
     <ClCompile Include="src\graphics\sprite.cpp" />
     <ClCompile Include="src\graphics\Renderers2D\renderable2D.cpp" />
     <ClCompile Include="src\graphics\shader.cpp" />
     <ClCompile Include="src\graphics\buffers\vertexArray.cpp" />
     <ClCompile Include="src\graphics\buffers\vertexBuffer.cpp" />
-    <ClCompile Include="src\graphics\texture.cpp" />
+    <ClCompile Include="src\graphics\textures\depthmap.cpp" />
+    <ClCompile Include="src\graphics\textures\texture.cpp" />
+    <ClCompile Include="src\logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\mat4.cpp" />
     <ClCompile Include="src\math\vec2.cpp" />
@@ -156,33 +162,41 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\graphics\buffers\frameBuffer.h" />
+    <ClInclude Include="src\graphics\buffers\uniformBuffer.h" />
+    <ClInclude Include="src\graphics\textures\cubemap.h" />
     <ClInclude Include="src\graphics\model.h" />
     <ClInclude Include="src\graphics\Renderers2D\batchRenderer2D.h" />
     <ClInclude Include="src\graphics\buffers\indexBuffer.h" />
-    <ClInclude Include="src\graphics\objParser.h" />
     <ClInclude Include="src\graphics\renderers3D\batchRenderer3D.h" />
     <ClInclude Include="src\graphics\renderers3D\renderable3D.h" />
     <ClInclude Include="src\graphics\renderers3D\renderer3D.h" />
+    <ClInclude Include="src\graphics\skybox.h" />
     <ClInclude Include="src\graphics\sprite.h" />
     <ClInclude Include="src\graphics\Renderers2D\renderable2D.h" />
     <ClInclude Include="src\graphics\Renderers2D\renderer2D.h" />
     <ClInclude Include="src\graphics\shader.h" />
     <ClInclude Include="src\graphics\buffers\vertexArray.h" />
     <ClInclude Include="src\graphics\buffers\vertexBuffer.h" />
-    <ClInclude Include="src\graphics\texture.h" />
+    <ClInclude Include="src\graphics\textures\depthmap.h" />
+    <ClInclude Include="src\graphics\textures\texture.h" />
+    <ClInclude Include="src\logging.h" />
     <ClInclude Include="src\math\mat4.h" />
     <ClInclude Include="src\math\math.h" />
     <ClInclude Include="src\math\mathUtility.h" />
     <ClInclude Include="src\math\vec2.h" />
     <ClInclude Include="src\math\vec3.h" />
     <ClInclude Include="src\math\vec4.h" />
+    <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
     <ClInclude Include="src\window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\basic.shader" />
     <None Include="res\shaders\batch2D.shader" />
-    <None Include="res\shaders\phong.shader" />
+    <None Include="res\shaders\blinn.shader" />
+    <None Include="res\shaders\depthmap.shader" />
+    <None Include="res\shaders\skybox.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

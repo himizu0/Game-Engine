@@ -5,6 +5,8 @@
 #include "renderable3D.h"
 #include "graphics/renderers3D/renderer3D.h"
 #include "graphics/buffers/vertexBuffer.h"
+#include "graphics/buffers/vertexArray.h"
+#include "graphics/buffers/uniformBuffer.h"
 #include "graphics/shader.h"
 #include "math/math.h"
 
@@ -24,21 +26,24 @@ namespace engine { namespace graphics {
 			float modelSlot;
 		};
 
+		UniformBuffer* m_ubo;
+		VertexArray* m_vao;
 		VertexBuffer* m_vbo;
 		Vertex* m_buffer;
 		unsigned int m_vertexCount;
-		Shader* m_shader;
 		std::unordered_map<unsigned int, unsigned int> m_textureSlotCache;
 		std::vector<math::mat4> m_models;
 		std::vector<math::mat4> m_normals;
 
 		public:
-		BatchRenderer3D(Shader* shader);
+		BatchRenderer3D();
 		~BatchRenderer3D();
 
 		void submit(const Renderable3D* renderable) override;
-		void flush() override;
+		void flush(Shader* shader) override;
 		void begin() override;
 		void end() override;
+
+		void setupUBO() const;
 	};
 } }

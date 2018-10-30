@@ -24,6 +24,7 @@ namespace engine { namespace math {
 		static mat4 translate(const vec3& translation);
 		static mat4 rotate(float angle, const vec3& axis);
 		static mat4 scale(const vec3& scale);
+		static mat4 scale(float scale);
 		static mat4 orthographic(float left, float right, float top, float bottom, float near, float far);
 		static mat4 perspective(float fov, float aspect, float near, float far);
 		static mat4 lookAt(const vec3& eye, const vec3& center, const vec3& up);
@@ -36,6 +37,8 @@ namespace engine { namespace math {
 		friend vec4 operator*(const mat4& matrix, const vec4& vector);
 		friend vec3 operator*(const mat4& matrix, const vec3& vector);
 		
+		mat4& wipeTranslation();
+
 		float& operator()(unsigned int row, unsigned int column);
 		const float& operator()(unsigned int row, unsigned int column) const;
 		mat4& operator/=(float scalar);
