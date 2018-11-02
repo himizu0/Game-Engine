@@ -77,15 +77,22 @@ int main() {
 		};
 
 		Shader shader("res/shaders/blinn.shader");
+		Shader shaderNormal("res/shaders/normalDisplay.shader");
 		Shader shaderBasic("res/shaders/basic.shader");
 		Shader shaderSkybox("res/shaders/skybox.shader");
 		Shader shaderDepthmap("res/shaders/depthmap.shader");
 
 		Texture checker("res/textures/checkerboard.png", true);
+		Texture celica("res/textures/Celica.png", true);
+		Texture white("res/textures/white.jpg", true);
 
 
-		Model torus("res/models/sample2.obj", checker, checker, mat4::rotate(45, {1, 0, 0}) * mat4::scale(20));
-		Model quad("res/models/quad.obj", checker, checker, mat4::translate({0, -50, 0}) * mat4::scale(20));
+		Model torus("res/models/sample2.obj", white, white, mat4::rotate(45, {1, 0, 0}) * mat4::scale(20));
+		Model torus2("res/models/sample2.obj", white, white, mat4::translate({-100, 0, 0}) * mat4::rotate(45, { 0, 1, 1 }) * mat4::scale(20));
+		Model quad("res/models/quad.obj", white, white, mat4::translate({0, -50, 0}) * mat4::scale(20));
+		Model cylinder("res/models/cylinder.obj", white, white, mat4::identity());
+		Model cylinder2("res/models/cylinder.obj", white, white, mat4::identity());
+		Model head("res/models/head.obj", white, white, mat4::translate({100, 0, 0}) * mat4::scale(10));
 
 		VertexArray vao1, vao2;
 
@@ -103,12 +110,6 @@ int main() {
 		IndexBuffer ibo2(indices, sizeof(indices));
 		vao2.unbind();
 
-		UniformBuffer ubo(sizeof(mat4), 0);
-		
-		//Depthmap depthmap(SHADOW_WIDTH, SHADOW_HEIGHT);
-		//FrameBuffer fboDepthmap;
-		//fboDepthmap.attachDepthmap(depthmap.getID());
-
 		std::vector<const char*> skyboxPaths;
 		skyboxPaths.push_back("res/textures/skyboxCloud/miramar_rt.tga");
 		skyboxPaths.push_back("res/textures/skyboxCloud/miramar_lf.tga");
@@ -118,7 +119,6 @@ int main() {
 		skyboxPaths.push_back("res/textures/skyboxCloud/miramar_ft.tga");
 		Skybox skybox(skyboxPaths, &shaderSkybox);
 		BatchRenderer3D renderer;
-		glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
 
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		while (!window.shouldClose()) {
@@ -131,25 +131,6 @@ int main() {
 
 			move();
 
-			//GLCall(glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT));
-			//fboDepthmap.bind();
-			//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-			//mat4 projLightSpace = mat4::perspective(45, 4.0f / 3.0f, 0.1f, 10000.0f);
-			//mat4 viewLightSpace = camera.getView();
-			//mat4 vpLightSpace = projLightSpace * viewLightSpace;
-			
-
-			/*renderer.begin();
-			renderer.submit(&torus);
-			renderer.submit(&quad);
-			renderer.end();
-			renderer.flush(&shaderDepthmap);*/
-
-			//fboDepthmap.unbind();
-
-
-			GLCall(glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT));
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 			mat4 view = camera.getView();
@@ -157,35 +138,44 @@ int main() {
 			mat4 vp = proj * view;
 
 			vec3 viewPos = camera.getPosition();
-			vec3 lightPos = { -100, 20, 100 };
+			vec3 lightPos = { -100 * cos((float)glfwGetTime() * .25f), 50, 100 * sin((float)glfwGetTime() * .25f)};
 
-			ubo.bind();
-			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4), &vp);
-			mat4 lightProj = mat4::orthographic(-100, 100, 1000, -100, -100, 1000);
-			mat4 lightView = camera.getView();
-			mat4 vpLightSpace = lightProj * lightView;
-			//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4), sizeof(mat4), &vpLightSpace);
+			cylinder.setTransform(mat4::translate(lightPos) * mat4::rotate(45 * glfwGetTime(), {1,1,1}) * mat4::scale(10));
+			cylinder2.setTransform(mat4::translate({-lightPos.x, lightPos.y, -lightPos.z}) * mat4::rotate(45 * glfwGetTime(), { 1,1,1 }) * mat4::scale(10));
+			torus.setTransform(mat4::rotate(45 * glfwGetTime(), {1,1,1}) * mat4::scale(20));
 
-			shaderBasic.use();
+			mat4 lightProj = mat4::orthographic(-100, 100, 100, -100, -100, 1000);
+			mat4 lightView = mat4::lookAt(lightPos, { 0,0,0 }, {0,1,0});
+			mat4 vpLightSpace = proj * lightView;
+
+			/*shaderBasic.use();
 			shaderBasic.setUniform4f("u_color", 1, 0, 0, 1);
 			vao1.bind();
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 			vao2.bind();
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);*/
 
 			shader.use();
-			shader.setUniform3f("u_viewPosition", viewPos.x, viewPos.y, viewPos.z);
-			shader.setUniform3f("u_light.position", lightPos.x, lightPos.y, lightPos.z);
-			shader.setUniform3f("u_light.ambient", .1f, .1f, .1f);
-			shader.setUniform3f("u_light.diffuse", 1, 1, 1);
-			shader.setUniform3f("u_light.specular", 1, 1, 1);
+			shader.setUniformMat4f("u_vp", vp);
 
-			//depthmap.bind(0);
-			//shader.setUniform1i("u_depthmap", 0);
+			shader.setUniform3f("u_viewPosition", viewPos.x, viewPos.y, viewPos.z);
+			shader.setUniform3f("u_light1.position", lightPos.x, lightPos.y, lightPos.z);
+			shader.setUniform3f("u_light1.ambient", .05f, .05f, .05f);
+			shader.setUniform3f("u_light1.diffuse", 1, 1, 1);
+			shader.setUniform3f("u_light1.specular", 1, 1, 1);
+
+			shader.setUniform3f("u_light2.position", -lightPos.x, lightPos.y, -lightPos.z);
+			shader.setUniform3f("u_light2.ambient", .05f, .05f, .05f);
+			shader.setUniform3f("u_light2.diffuse", 1, 1, 1);
+			shader.setUniform3f("u_light2.specular", 1, 1, 1);
 
 			renderer.begin();
 			renderer.submit(&torus);
+			renderer.submit(&torus2);
 			renderer.submit(&quad);
+			renderer.submit(&cylinder);
+			renderer.submit(&cylinder2);
+			renderer.submit(&head);
 			renderer.end();
 			renderer.flush(&shader);
 

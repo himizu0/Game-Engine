@@ -34,6 +34,7 @@ namespace engine { namespace graphics {
 					type = ShaderType::VERTEX;
 				else if (line.find("geometry") != std::string::npos)
 					type = ShaderType::GEOMETRY;
+
 				else if (line.find("fragment") != std::string::npos)
 					type = ShaderType::FRAGMENT;
 			}
@@ -59,15 +60,17 @@ namespace engine { namespace graphics {
 			printf("[Shader Error] Failed to compile vertex shader: %s\n", infoLog);
 		}
 
-		/*GLCall(unsigned int geometryShader = glCreateShader(GL_GEOMETRY_SHADER));
+		GLCall(unsigned int geometryShader = glCreateShader(GL_GEOMETRY_SHADER));
 		src = m_geometrySource.c_str();
+		bool geometry = false;
+		if (src[0] != '\0') geometry = true;
 		GLCall(glShaderSource(geometryShader, 1, &src, nullptr));
 		GLCall(glCompileShader(geometryShader));
 		GLCall(glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success));
 		if (!success) {
 			GLCall(glGetShaderInfoLog(geometryShader, 512, nullptr, infoLog));
 			printf("[Shader Error] Failed to compile geometry shader: %s\n", infoLog);
-		}*/
+		}
 
 		GLCall(unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER));
 		src = m_fragmentSource.c_str();
@@ -81,13 +84,13 @@ namespace engine { namespace graphics {
 
 		GLCall(m_rendererID = glCreateProgram());
 		GLCall(glAttachShader(m_rendererID, vertexShader));
-		//GLCall(glAttachShader(m_rendererID, geometryShader));
+		GLCall(if(geometry) glAttachShader(m_rendererID, geometryShader));
 		GLCall(glAttachShader(m_rendererID, fragmentShader));
 		GLCall(glLinkProgram(m_rendererID));
 		GLCall(glValidateProgram(m_rendererID));
 
 		GLCall(glDeleteShader(vertexShader));
-		//GLCall(glDeleteShader(geometryShader));
+		GLCall(if(geometry) glDeleteShader(geometryShader));
 		GLCall(glDeleteShader(fragmentShader));
 	}
 

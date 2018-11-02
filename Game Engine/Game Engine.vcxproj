@@ -196,6 +196,7 @@
     <None Include="res\shaders\batch2D.shader" />
     <None Include="res\shaders\blinn.shader" />
     <None Include="res\shaders\depthmap.shader" />
+    <None Include="res\shaders\normalDisplay.shader" />
     <None Include="res\shaders\skybox.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -7,7 +7,7 @@ namespace engine { namespace graphics {
 	BatchRenderer3D::BatchRenderer3D()
 		: m_vertexCount(0) {
 		
-		m_ubo = new UniformBuffer(1024 * sizeof(math::mat4), 1, nullptr, true);
+		m_ubo = new UniformBuffer(1024 * sizeof(math::mat4), 0, nullptr, true);
 
 		m_vao = new VertexArray();
 		m_vao->bind();
@@ -110,6 +110,8 @@ namespace engine { namespace graphics {
 		shader->setUniform1iv("u_textures", textures, 31);
 
 		setupUBO();
+		//shader->setUniformMat4fv("u_models", &m_models[0], 64);
+		//shader->setUniformMat4fv("u_normals", &m_normals[0], 64);
 
 		m_vao->bind();
 		GLCall(glDrawArrays(GL_TRIANGLES, 0, m_vertexCount));
