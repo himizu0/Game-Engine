@@ -46,8 +46,16 @@ struct Material {
 	float shininess;
 };
 
-struct Light {
+struct PointLight {
 	vec3 position;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
+struct DirectionalLight {
+	vec3 direction;
 
 	vec3 ambient;
 	vec3 diffuse;
@@ -67,10 +75,12 @@ out vec4 color;
 
 uniform vec3 u_viewPosition;
 uniform sampler2D u_textures[32];
-uniform Light u_light1;
-uniform Light u_light2;
+uniform PointLight u_lights[2];
+uniform DirectionalLight u_dirLight;
 
-vec4 calculateLighting(Light light) {
+
+
+vec4 calculatePointLighting(PointLight light) {
 	int diffuseSlot = int(fs_in.diffuseSlot + 0.1);
 	int specularSlot = int(fs_in.specularSlot + 0.1);
 
@@ -85,14 +95,37 @@ vec4 calculateLighting(Light light) {
 	vec3 specular = pow(max(dot(halfDir, normal), 0), 8) * vec3(texture(u_textures[specularSlot], fs_in.texCoord)) * light.specular;
 
 	float distance = length(fs_in.fragPosition - light.position);
-	vec4 lightingColor = vec4(ambient + (diffuse + specular) / (1 + 0.0014f * distance + 0.000007f * distance * distance), texture(u_textures[diffuseSlot], fs_in.texCoord).w);
+	vec4 lightingColor = vec4(ambient + (diffuse + specular) / (1 + 0.00014f * distance + 0.0000007f * distance * distance), texture(u_textures[diffuseSlot], fs_in.texCoord).w);
+
+	return lightingColor;
+}
+
+vec4 calculateDirectionalLighting(DirectionalLight light) {
+	int diffuseSlot = int(fs_in.diffuseSlot + 0.1);
+	int specularSlot = int(fs_in.specularSlot + 0.1);
+
+	vec3 ambient = vec3(texture(u_textures[diffuseSlot], fs_in.texCoord)) * light.ambient;
+
+	vec3 normal = normalize(fs_in.normal);
+	vec3 lightDir = normalize(light.direction);
+	vec3 diffuse = max(dot(normal, lightDir), 0) * vec3(texture(u_textures[diffuseSlot], fs_in.texCoord)) * light.diffuse;
+
+	vec3 viewDir = normalize(u_viewPosition - fs_in.fragPosition);
+	vec3 halfDir = normalize(viewDir + lightDir);
+	vec3 specular = pow(max(dot(halfDir, normal), 0), 8) * vec3(texture(u_textures[specularSlot], fs_in.texCoord)) * light.specular;
+
+	vec4 lightingColor = vec4(ambient + diffuse + specular, texture(u_textures[diffuseSlot], fs_in.texCoord).w);
 
 	return lightingColor;
 }
 
 void main() {
-	color = calculateLighting(u_light1);
-	color += calculateLighting(u_light2);
+	color = vec4(0, 0, 0, 0);
 
-	color = (floor(color * 3) / 3) +.05f;
+	//for (unsigned int i = 0; i < 2; i++)
+		//color += calculatePointLighting(u_lights[i]);
+
+	color += calculateDirectionalLighting(u_dirLight);
+
+	color = clamp(floor(color * 3) / 3, vec4(0.05f,0.05f,0.05f,0.0f), vec4(.95f,.95f,.95f,1.0f));
 }

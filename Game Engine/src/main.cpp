@@ -26,8 +26,8 @@ using namespace engine;
 using namespace math;
 using namespace graphics;
 
-#define WINDOW_WIDTH 1200
-#define WINDOW_HEIGHT 800
+#define WINDOW_WIDTH 1600
+#define WINDOW_HEIGHT 1200
 #define SHADOW_WIDTH 1024
 #define SHADOW_HEIGHT 1024
 
@@ -85,14 +85,15 @@ int main() {
 		Texture checker("res/textures/checkerboard.png", true);
 		Texture celica("res/textures/Celica.png", true);
 		Texture white("res/textures/white.jpg", true);
+		Texture pureWhite("res/textures/pureWhite.png", true);
 
 
 		Model torus("res/models/sample2.obj", white, white, mat4::rotate(45, {1, 0, 0}) * mat4::scale(20));
 		Model torus2("res/models/sample2.obj", white, white, mat4::translate({-100, 0, 0}) * mat4::rotate(45, { 0, 1, 1 }) * mat4::scale(20));
-		Model quad("res/models/quad.obj", white, white, mat4::translate({0, -50, 0}) * mat4::scale(20));
+		Model quad("res/models/quad.obj", white, white, mat4::translate({0, -100, 0}) * mat4::scale(20));
 		Model cylinder("res/models/cylinder.obj", white, white, mat4::identity());
 		Model cylinder2("res/models/cylinder.obj", white, white, mat4::identity());
-		Model head("res/models/head.obj", white, white, mat4::translate({100, 0, 0}) * mat4::scale(10));
+		Model head("res/models/head.obj", pureWhite, pureWhite, mat4::translate({100, 0, 0}) * mat4::scale(10));
 
 		VertexArray vao1, vao2;
 
@@ -138,7 +139,7 @@ int main() {
 			mat4 vp = proj * view;
 
 			vec3 viewPos = camera.getPosition();
-			vec3 lightPos = { -100 * cos((float)glfwGetTime() * .25f), 50, 100 * sin((float)glfwGetTime() * .25f)};
+			vec3 lightPos = { -200 * cos((float)glfwGetTime() * .1f), 100, 100 * sin((float)glfwGetTime() * .1f)};
 
 			cylinder.setTransform(mat4::translate(lightPos) * mat4::rotate(45 * glfwGetTime(), {1,1,1}) * mat4::scale(10));
 			cylinder2.setTransform(mat4::translate({-lightPos.x, lightPos.y, -lightPos.z}) * mat4::rotate(45 * glfwGetTime(), { 1,1,1 }) * mat4::scale(10));
@@ -159,15 +160,20 @@ int main() {
 			shader.setUniformMat4f("u_vp", vp);
 
 			shader.setUniform3f("u_viewPosition", viewPos.x, viewPos.y, viewPos.z);
-			shader.setUniform3f("u_light1.position", lightPos.x, lightPos.y, lightPos.z);
-			shader.setUniform3f("u_light1.ambient", .05f, .05f, .05f);
-			shader.setUniform3f("u_light1.diffuse", 1, 1, 1);
-			shader.setUniform3f("u_light1.specular", 1, 1, 1);
+			shader.setUniform3f("u_lights[0].position", lightPos.x, lightPos.y, lightPos.z);
+			shader.setUniform3f("u_lights[0].ambient", .05f, .05f, .05f);
+			shader.setUniform3f("u_lights[0].diffuse", 1, 1, 1);
+			shader.setUniform3f("u_lights[0].specular", 1, 0, 0);
 
-			shader.setUniform3f("u_light2.position", -lightPos.x, lightPos.y, -lightPos.z);
-			shader.setUniform3f("u_light2.ambient", .05f, .05f, .05f);
-			shader.setUniform3f("u_light2.diffuse", 1, 1, 1);
-			shader.setUniform3f("u_light2.specular", 1, 1, 1);
+			shader.setUniform3f("u_lights[1].position", -lightPos.x, lightPos.y, -lightPos.z);
+			shader.setUniform3f("u_lights[1].ambient", .05f, .05f, .05f);
+			shader.setUniform3f("u_lights[1].diffuse", 1, 1, 1);
+			shader.setUniform3f("u_lights[1].specular", 1, 0, 0);
+
+			shader.setUniform3f("u_dirLight.direction", 1, 1, 1);
+			shader.setUniform3f("u_dirLight.ambient", .05f, .05f, .05f);
+			shader.setUniform3f("u_dirLight.diffuse", 1, 0, 0);
+			shader.setUniform3f("u_dirLight.specular", 1, 0, 0);
 
 			renderer.begin();
 			renderer.submit(&torus);
@@ -179,9 +185,9 @@ int main() {
 			renderer.end();
 			renderer.flush(&shader);
 
-			shaderSkybox.use();
+			/*shaderSkybox.use();
 			shaderSkybox.setUniformMat4f("u_skyboxvp", proj * view.wipeTranslation());
-			skybox.draw();
+			skybox.draw();*/
 
 			window.update();
 		}
