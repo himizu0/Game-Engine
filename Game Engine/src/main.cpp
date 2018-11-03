@@ -90,7 +90,7 @@ int main() {
 
 		Model torus("res/models/sample2.obj", white, white, mat4::rotate(45, {1, 0, 0}) * mat4::scale(20));
 		Model torus2("res/models/sample2.obj", white, white, mat4::translate({-100, 0, 0}) * mat4::rotate(45, { 0, 1, 1 }) * mat4::scale(20));
-		Model quad("res/models/quad.obj", white, white, mat4::translate({0, -100, 0}) * mat4::scale(20));
+		Model quad("res/models/quad.obj", white, white, mat4::translate({0, -150, 0}) * mat4::scale(20));
 		Model cylinder("res/models/cylinder.obj", white, white, mat4::identity());
 		Model cylinder2("res/models/cylinder.obj", white, white, mat4::identity());
 		Model head("res/models/head.obj", pureWhite, pureWhite, mat4::translate({100, 0, 0}) * mat4::scale(10));
@@ -172,7 +172,7 @@ int main() {
 
 			shader.setUniform3f("u_dirLight.direction", 1, 1, 1);
 			shader.setUniform3f("u_dirLight.ambient", .05f, .05f, .05f);
-			shader.setUniform3f("u_dirLight.diffuse", 1, 0, 0);
+			shader.setUniform3f("u_dirLight.diffuse", 1, .5f, .5f);
 			shader.setUniform3f("u_dirLight.specular", 1, 0, 0);
 
 			renderer.begin();
@@ -185,9 +185,9 @@ int main() {
 			renderer.end();
 			renderer.flush(&shader);
 
-			/*shaderSkybox.use();
-			shaderSkybox.setUniformMat4f("u_skyboxvp", proj * view.wipeTranslation());
-			skybox.draw();*/
+			//shaderSkybox.use();
+			//shaderSkybox.setUniformMat4f("u_skyboxvp", proj * view.wipeTranslation());
+			//skybox.draw();
 
 			window.update();
 		}

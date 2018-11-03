@@ -157,6 +157,7 @@
     <ClCompile Include="src\math\vec2.cpp" />
     <ClCompile Include="src\math\vec3.cpp" />
     <ClCompile Include="src\math\vec4.cpp" />
+    <ClCompile Include="src\physics\particle.cpp" />
     <ClCompile Include="src\vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="src\window.cpp" />
   </ItemGroup>
@@ -187,6 +188,7 @@
     <ClInclude Include="src\math\vec2.h" />
     <ClInclude Include="src\math\vec3.h" />
     <ClInclude Include="src\math\vec4.h" />
+    <ClInclude Include="src\physics\particle.h" />
     <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
     <ClInclude Include="src\window.h" />
