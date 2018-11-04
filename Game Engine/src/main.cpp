@@ -92,7 +92,7 @@ int main() {
 
 		Model torus("res/models/sample2.obj", white, white, mat4::rotate(45, {1, 0, 0}) * mat4::scale(20));
 		Model torus2("res/models/sample2.obj", white, white, mat4::translate({-100, 0, 0}) * mat4::scale(20));
-		Model torus3("res/models/sample2.obj", white, white, mat4::translate({-100, 0, 50}) * mat4::scale(20));
+		Model torus3("res/models/cylinder.obj", white, white, mat4::translate({-100, 0, 50}) * mat4::scale(20));
 		Model quad("res/models/quad.obj", white, white, mat4::translate({0, -150, 0}) * mat4::scale(20));
 		Model cylinder("res/models/cylinder.obj", white, white, mat4::identity());
 		Model cylinder2("res/models/cylinder.obj", white, white, mat4::identity());
@@ -124,13 +124,15 @@ int main() {
 		Skybox skybox(skyboxPaths, &shaderSkybox);
 		BatchRenderer3D renderer;
 
-		Particle* particle = new Particle({ 0,0,0 }, { 20, 0,0 }, {1,0,0}, 1.0f);
-		Particle* particle2 = new Particle({ 0,0,50 }, { 20, 0,0 }, {1,0,0}, 1.0f);
+		Particle* particle = new Particle({ 0,0,0 }, { 20, 0,0 }, {0,0,0}, 1.0f);
+		Particle* particle2 = new Particle({ 0,100,50 }, { 20, 0,0 }, {0,0,0}, 1.0f);
 
-		DragGenerator* dragGenerator = new DragGenerator(.5f, .5f);
+		DragGenerator* dragGenerator = new DragGenerator(2.0f, 10.0f);
+		SpringGenerator* springGenerator = new SpringGenerator(particle, 1, 0);
 
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		while (!window.shouldClose()) {
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 			if (window.getKeyDown(GLFW_KEY_ESCAPE))
 				window.close();
 
@@ -140,11 +142,11 @@ int main() {
 
 			move();
 	
-			dragGenerator->updateForce(particle, deltaTime);
+			dragGenerator->updateForce(particle2, deltaTime);
+			springGenerator->updateForce(particle2, deltaTime);
 			particle->integrate(deltaTime);
 			particle2->integrate(deltaTime);
 
-			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 			mat4 view = camera.getView();
 			mat4 proj = mat4::perspective(45, 4.0f / 3.0f, 0.1f, 10000.0f);

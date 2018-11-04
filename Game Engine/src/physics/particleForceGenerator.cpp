@@ -14,4 +14,16 @@ namespace engine { namespace physics {
 
 		particle->addForce(force);
 	}
+
+	SpringGenerator::SpringGenerator(Particle* other, float springConstant, float restLength)
+		: other(other), springConstant(springConstant), restLength(restLength) {
+	}
+
+	void SpringGenerator::updateForce(Particle* particle, float deltaTime) {
+		math::vec3 differenceVector = particle->position - other->position;
+
+		math::vec3 force = -springConstant * (magnitude(differenceVector) - restLength) * normalize(differenceVector);
+
+		particle->addForce(force);
+	}
 } }
