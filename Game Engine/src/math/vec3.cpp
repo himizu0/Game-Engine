@@ -91,6 +91,15 @@ namespace engine { namespace math {
 		return !(left == right);
 	}
 
+
+	vec3 vec3::operator-() {
+		return vec3{
+			-x,
+			-y,
+			-z
+		};
+	}
+
 	vec3& vec3::operator+=(const vec3& other) {
 		x += other.x;
 		y += other.y;

@@ -4,6 +4,7 @@
 #include "window.h"
 #include "camera.h"
 #include "math/math.h"
+#include "physics/physics.h"
 #include "graphics/shader.h"
 #include "graphics/buffers/vertexBuffer.h"
 #include "graphics/buffers/indexBuffer.h"
@@ -24,6 +25,7 @@
 
 using namespace engine;
 using namespace math;
+using namespace physics;
 using namespace graphics;
 
 #define WINDOW_WIDTH 1600
@@ -89,7 +91,8 @@ int main() {
 
 
 		Model torus("res/models/sample2.obj", white, white, mat4::rotate(45, {1, 0, 0}) * mat4::scale(20));
-		Model torus2("res/models/sample2.obj", white, white, mat4::translate({-100, 0, 0}) * mat4::rotate(45, { 0, 1, 1 }) * mat4::scale(20));
+		Model torus2("res/models/sample2.obj", white, white, mat4::translate({-100, 0, 0}) * mat4::scale(20));
+		Model torus3("res/models/sample2.obj", white, white, mat4::translate({-100, 0, 50}) * mat4::scale(20));
 		Model quad("res/models/quad.obj", white, white, mat4::translate({0, -150, 0}) * mat4::scale(20));
 		Model cylinder("res/models/cylinder.obj", white, white, mat4::identity());
 		Model cylinder2("res/models/cylinder.obj", white, white, mat4::identity());
@@ -121,6 +124,11 @@ int main() {
 		Skybox skybox(skyboxPaths, &shaderSkybox);
 		BatchRenderer3D renderer;
 
+		Particle* particle = new Particle({ 0,0,0 }, { 20, 0,0 }, {1,0,0}, 1.0f);
+		Particle* particle2 = new Particle({ 0,0,50 }, { 20, 0,0 }, {1,0,0}, 1.0f);
+
+		DragGenerator* dragGenerator = new DragGenerator(.5f, .5f);
+
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		while (!window.shouldClose()) {
 			if (window.getKeyDown(GLFW_KEY_ESCAPE))
@@ -131,6 +139,10 @@ int main() {
 			lastTime = currentTime;
 
 			move();
+	
+			dragGenerator->updateForce(particle, deltaTime);
+			particle->integrate(deltaTime);
+			particle2->integrate(deltaTime);
 
 			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
@@ -144,6 +156,9 @@ int main() {
 			cylinder.setTransform(mat4::translate(lightPos) * mat4::rotate(45 * glfwGetTime(), {1,1,1}) * mat4::scale(10));
 			cylinder2.setTransform(mat4::translate({-lightPos.x, lightPos.y, -lightPos.z}) * mat4::rotate(45 * glfwGetTime(), { 1,1,1 }) * mat4::scale(10));
 			torus.setTransform(mat4::rotate(45 * glfwGetTime(), {1,1,1}) * mat4::scale(20));
+
+			torus2.setTransform(mat4::translate(particle->position) * mat4::scale(20));
+			torus3.setTransform(mat4::translate(particle2->position) * mat4::scale(20));
 
 			mat4 lightProj = mat4::orthographic(-100, 100, 100, -100, -100, 1000);
 			mat4 lightView = mat4::lookAt(lightPos, { 0,0,0 }, {0,1,0});
@@ -178,6 +193,7 @@ int main() {
 			renderer.begin();
 			renderer.submit(&torus);
 			renderer.submit(&torus2);
+			renderer.submit(&torus3);
 			renderer.submit(&quad);
 			renderer.submit(&cylinder);
 			renderer.submit(&cylinder2);

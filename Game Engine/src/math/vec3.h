@@ -5,6 +5,7 @@ namespace engine { namespace math {
 	struct vec3 {
 		float x, y, z;
 
+		vec3() = default;
 		vec3(float x, float y, float z);
 
 		friend float magnitude(const vec3& vector);
@@ -23,6 +24,7 @@ namespace engine { namespace math {
 		friend bool operator==(const vec3& left, const vec3& right);
 		friend bool operator!=(const vec3& left, const vec3& right);
 
+		vec3 operator-();
 		vec3& operator+=(const vec3& other);
 		vec3& operator-=(const vec3& other);
 		vec3& operator*=(float scalar);
