@@ -12,6 +12,8 @@ namespace engine { namespace math {
 	}
 
 	vec3 normalize(const vec3& vector) {
+		if (vector == vec3(0, 0, 0)) return { 0,0,0 };
+
 		const float oom = 1.0f / magnitude(vector);
 
 		return oom * vector;
@@ -40,7 +42,7 @@ namespace engine { namespace math {
 	}
 
 	std::ostream& operator<<(std::ostream& stream, const vec3& vector) {
-		return stream << "(" << vector.x << "," << vector.y << ", " << vector.z << ")";
+		return stream << "(" << vector.x << ", " << vector.y << ", " << vector.z << ")";
 	}
 
 	vec3 operator+(const vec3& left, const vec3& right) {
