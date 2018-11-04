@@ -124,15 +124,14 @@ int main() {
 		Skybox skybox(skyboxPaths, &shaderSkybox);
 		BatchRenderer3D renderer;
 
-		Particle* particle = new Particle({ 0,0,0 }, { 0, 0,0 }, {0,0,0}, 1.0f);
-		Particle* particle2 = new Particle({ 0,-100,50 }, { 0, 0,0 }, {0,0,0}, 1.0f);
+		//Particle* particle = new Particle({ 0,0,0 }, { 0, 0,0 }, {0,0,0}, 1.0f);
+		//Particle* particle2 = new Particle({ 0,-200,50 }, { 0, 0,0 }, {0,0,0}, 1.0f);
 
-		DragGenerator* dragGenerator = new DragGenerator(2.0f, 10.0f);
-		SpringGenerator* springGenerator = new SpringGenerator(particle, 1, 0);
+		//DragGenerator* dragGenerator = new DragGenerator(2.0f, 5.0f);
+		//SpringGenerator* springGenerator = new SpringGenerator(particle, 1, 0);
 
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		while (!window.shouldClose()) {
-			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 			if (window.getKeyDown(GLFW_KEY_ESCAPE))
 				window.close();
 
@@ -142,10 +141,12 @@ int main() {
 
 			move();
 	
-			dragGenerator->updateForce(particle2, deltaTime);
-			springGenerator->updateForce(particle2, deltaTime);
-			particle->integrate(deltaTime);
-			particle2->integrate(deltaTime);
+			//dragGenerator->updateForce(particle2, deltaTime);
+			//springGenerator->updateForce(particle2, deltaTime);
+			//particle->integrate(deltaTime);
+			//particle2->integrate(deltaTime);
+
+			glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 			mat4 view = camera.getView();
 			mat4 proj = mat4::perspective(45, 4.0f / 3.0f, 0.1f, 10000.0f);
@@ -158,8 +159,8 @@ int main() {
 			cylinder2.setTransform(mat4::translate({-lightPos.x, lightPos.y, -lightPos.z}) * mat4::rotate(45 * glfwGetTime(), { 1,1,1 }) * mat4::scale(10));
 			torus.setTransform(mat4::rotate(45 * glfwGetTime(), {1,1,1}) * mat4::scale(20));
 
-			torus2.setTransform(mat4::translate(particle->position) * mat4::scale(20));
-			torus3.setTransform(mat4::translate(particle2->position) * mat4::scale(20));
+			//torus2.setTransform(mat4::translate(particle->position) * mat4::scale(20));
+			//torus3.setTransform(mat4::translate(particle2->position) * mat4::scale(20));
 
 			mat4 lightProj = mat4::orthographic(-100, 100, 100, -100, -100, 1000);
 			mat4 lightView = mat4::lookAt(lightPos, { 0,0,0 }, {0,1,0});
